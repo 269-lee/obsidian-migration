@@ -47,7 +47,7 @@ export default function ConnectPage() {
             value={claudeApiKey}
             onChange={e => setClaudeApiKey(e.target.value)}
             placeholder="sk-ant-..."
-            className="w-full border rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400"
           />
           <p className="text-xs text-gray-400 mt-1">console.anthropic.com 에서 발급 — 서버에 저장되지 않습니다</p>
         </div>
@@ -59,7 +59,7 @@ export default function ConnectPage() {
             value={notionToken}
             onChange={e => setNotionToken(e.target.value)}
             placeholder="secret_..."
-            className="w-full border rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400"
           />
           <p className="text-xs text-gray-400 mt-1">notion.so/my-integrations 에서 발급</p>
         </div>
@@ -71,7 +71,7 @@ export default function ConnectPage() {
             value={slackToken}
             onChange={e => setSlackToken(e.target.value)}
             placeholder="xoxb-..."
-            className="w-full border rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400"
           />
           <p className="text-xs text-gray-400 mt-1">api.slack.com/apps 에서 발급</p>
         </div>
