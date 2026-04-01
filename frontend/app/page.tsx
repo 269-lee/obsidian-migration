@@ -4,12 +4,17 @@ import { useRouter } from 'next/navigation'
 
 export default function ConnectPage() {
   const router = useRouter()
+  const [claudeApiKey, setClaudeApiKey] = useState('')
   const [notionToken, setNotionToken] = useState('')
   const [slackToken, setSlackToken] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   async function handleConnect() {
+    if (!claudeApiKey) {
+      setError('Claude API 키를 입력해주세요.')
+      return
+    }
     if (!notionToken && !slackToken) {
       setError('최소 하나의 툴을 연결해주세요.')
       return
@@ -17,7 +22,7 @@ export default function ConnectPage() {
     setLoading(true)
     setError('')
     try {
-      const tokens: Record<string, string> = {}
+      const tokens: Record<string, string> = { claude_api_key: claudeApiKey }
       if (notionToken) tokens.notion_token = notionToken
       if (slackToken) tokens.slack_token = slackToken
       sessionStorage.setItem('tokens', JSON.stringify(tokens))
@@ -35,6 +40,18 @@ export default function ConnectPage() {
       </div>
 
       <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Claude API Key</label>
+          <input
+            type="password"
+            value={claudeApiKey}
+            onChange={e => setClaudeApiKey(e.target.value)}
+            placeholder="sk-ant-..."
+            className="w-full border rounded-lg px-3 py-2 text-sm"
+          />
+          <p className="text-xs text-gray-400 mt-1">console.anthropic.com 에서 발급 — 서버에 저장되지 않습니다</p>
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-1">Notion Integration Token</label>
           <input

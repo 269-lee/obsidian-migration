@@ -32,6 +32,7 @@ export default function MigratePage() {
     const folderStructure = JSON.parse(sessionStorage.getItem('folder_structure') ?? '["Projects","Areas","Resources","Inbox"]')
 
     const body = {
+      claude_api_key: tokens.claude_api_key ?? '',
       notion_token: tokens.notion_token,
       notion_page_ids: selection.selectedNotion ?? [],
       slack_token: tokens.slack_token,

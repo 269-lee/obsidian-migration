@@ -27,6 +27,7 @@ app.add_middleware(
 
 
 class SourceSelection(BaseModel):
+    claude_api_key: str
     notion_token: str | None = None
     notion_page_ids: list[str] = []
     slack_token: str | None = None
@@ -73,9 +74,9 @@ def list_google_docs(body: dict):
 
 @app.post("/api/migrate")
 def migrate(selection: SourceSelection):
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = selection.claude_api_key
     if not api_key:
-        raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not set")
+        raise HTTPException(status_code=400, detail="Claude API 키를 입력해주세요")
 
     def generate():
         documents = []
