@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian Migration</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0f0f1a; color:#e2e8f0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  .page { max-width:680px; margin:0 auto; padding:52px 24px 56px; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:72px; }
+  .logo { font-size:14px; font-weight:600; color:#a78bfa; letter-spacing:.05em; }
+  .nav-badge { font-size:11px; background:rgba(124,58,237,0.2); color:#a78bfa; border:1px solid rgba(124,58,237,0.3); padding:4px 10px; border-radius:20px; }
+
+  /* Hero */
+  .hero { text-align:center; margin-bottom:0; }
+  h1 { font-size:42px; font-weight:800; line-height:1.2; margin-bottom:14px; background:linear-gradient(135deg,#fff 0%,#a78bfa 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .sub { font-size:16px; color:#94a3b8; line-height:1.7; }
+
+  /* 다이어그램 */
+  .diagram { position:relative; width:100%; height:220px; margin:44px 0 56px; }
+  .source-logos { position:absolute; left:0; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:18px; }
+  .src-item { display:flex; align-items:center; gap:12px; }
+  .src-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); padding:10px; }
+  .src-icon img { width:100%; height:100%; object-fit:contain; }
+  .src-label { font-size:12px; color:#94a3b8; font-weight:500; }
+  .flow-svg { position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+  .obsidian-center { position:absolute; right:0; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .obsidian-icon { width:76px; height:76px; border-radius:22px; background:linear-gradient(135deg,#7c3aed,#4c1d95); display:flex; align-items:center; justify-content:center; padding:14px; box-shadow:0 0 32px rgba(124,58,237,0.6),0 0 64px rgba(124,58,237,0.25); border:1px solid rgba(167,139,250,0.4); animation:pulse 2.5s ease-in-out infinite; }
+  .obsidian-icon img { width:100%; height:100%; filter:brightness(0) invert(1); }
+  .obsidian-label { font-size:12px; color:#a78bfa; font-weight:600; }
+  @keyframes pulse{0%,100%{box-shadow:0 0 32px rgba(124,58,237,0.6),0 0 64px rgba(124,58,237,0.25)}50%{box-shadow:0 0 48px rgba(124,58,237,0.9),0 0 90px rgba(124,58,237,0.4)}}
+  .particle { position:absolute; width:7px; height:7px; border-radius:50%; opacity:0; }
+  .pt1{background:#a78bfa;animation:flow1 2.4s ease-in-out infinite}
+  .pt2{background:#7c3aed;animation:flow2 2.4s ease-in-out infinite .5s}
+  .pt3{background:#a78bfa;animation:flow3 2.4s ease-in-out infinite 1s}
+  .pt1b{background:#c4b5fd;animation:flow1 2.4s ease-in-out infinite 1.2s}
+  .pt2b{background:#7c3aed;animation:flow2 2.4s ease-in-out infinite 1.7s}
+  .pt3b{background:#c4b5fd;animation:flow3 2.4s ease-in-out infinite 2.1s}
+  @keyframes flow1{0%{left:64px;top:22%;opacity:0;transform:scale(.4)}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 90px);top:50%;opacity:0;transform:scale(1.3)}}
+  @keyframes flow2{0%{left:64px;top:50%;opacity:0;transform:scale(.4)}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 90px);top:50%;opacity:0;transform:scale(1.3)}}
+  @keyframes flow3{0%{left:64px;top:78%;opacity:0;transform:scale(.4)}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 90px);top:50%;opacity:0;transform:scale(1.3)}}
+
+  /* 공감 섹션 */
+  .empathy { margin-bottom:72px; }
+  .empathy-intro { font-size:13px; color:#64748b; margin-bottom:20px; }
+  .pain-cards { display:flex; flex-direction:column; gap:12px; }
+  .pain-card { border-radius:16px; padding:24px; display:flex; gap:18px; align-items:flex-start; }
+  .pain-card.p1 { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); }
+  .pain-card.p2 { background:rgba(124,58,237,0.05); border:1px solid rgba(124,58,237,0.15); }
+  .pain-icon-wrap { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; margin-top:2px; }
+  .pain-card.p1 .pain-icon-wrap { background:rgba(255,255,255,0.05); }
+  .pain-card.p2 .pain-icon-wrap { background:rgba(124,58,237,0.12); }
+  .pain-body { flex:1; }
+  .pain-card h3 { font-size:16px; font-weight:700; margin-bottom:8px; color:#f1f5f9; line-height:1.4; }
+  .pain-card p { font-size:13px; color:#94a3b8; line-height:1.7; }
+  .scatter { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+  .scatter-tag { font-size:11px; padding:3px 10px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#64748b; }
+  .obsidian-question { margin-top:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 14px; font-size:12px; color:#94a3b8; font-style:italic; display:flex; gap:8px; align-items:flex-start; }
+  .q-mark { color:#64748b; font-size:16px; font-weight:800; font-style:normal; flex-shrink:0; line-height:1.2; }
+
+  /* 섹션 타이틀 */
+  .section-intro { margin-bottom:24px; padding-left:2px; }
+  .section-intro .eyebrow { font-size:18px; color:#a78bfa; font-weight:800; letter-spacing:-.01em; margin-bottom:10px; }
+  .section-intro p { font-size:15px; color:#94a3b8; line-height:1.75; }
+
+  /* 플로우 래퍼 */
+  .flow-wrap { border:1px solid rgba(255,255,255,0.07); border-radius:24px; overflow:hidden; margin-bottom:56px; }
+  .migration-area { padding:28px 28px 0; }
+  .migration-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .migration-label { font-size:11px; color:#7c3aed; font-weight:700; letter-spacing:.1em; text-transform:uppercase; flex-shrink:0; }
+  .migration-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(124,58,237,0.3),transparent); }
+  .steps-row { display:flex; gap:12px; }
+  .step-card { flex:1; background:#16122a; border:1px solid rgba(124,58,237,0.2); border-radius:14px; padding:20px 18px; }
+  .step-num { display:inline-flex; width:26px; height:26px; border-radius:7px; background:rgba(124,58,237,0.3); border:1px solid rgba(124,58,237,0.5); font-size:12px; font-weight:800; color:#a78bfa; align-items:center; justify-content:center; margin-bottom:12px; }
+  .step-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; color:#f1f5f9; }
+  .step-card p { font-size:12px; color:#94a3b8; line-height:1.65; }
+
+  .transition-band { margin-top:28px; padding:14px 28px; background:linear-gradient(180deg,#16122a 0%,#0d0d1f 100%); display:flex; align-items:center; gap:16px; }
+  .t-line { flex:1; height:1px; }
+  .t-line.l { background:linear-gradient(90deg,rgba(124,58,237,0.35),rgba(124,58,237,0.05)); }
+  .t-line.r { background:linear-gradient(270deg,rgba(124,58,237,0.35),rgba(124,58,237,0.05)); }
+  .t-dots { display:flex; gap:4px; }
+  .t-dot { width:4px; height:4px; border-radius:50%; background:rgba(124,58,237,0.4); }
+
+  .growth-area { padding:28px; background:linear-gradient(135deg,#0d0d1f 0%,#130d24 100%); position:relative; overflow:hidden; }
+  .growth-area::before { content:''; position:absolute; top:-40px; right:-40px; width:260px; height:260px; background:radial-gradient(circle,rgba(124,58,237,0.1) 0%,transparent 65%); pointer-events:none; }
+  .growth-top { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:24px; }
+  .growth-text { flex:1; }
+  .growth-eyebrow { font-size:11px; color:#7c3aed; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+  .growth-text h3 { font-size:22px; font-weight:800; line-height:1.3; margin-bottom:10px; color:#f1f5f9; }
+  .growth-text p { font-size:13px; color:#94a3b8; line-height:1.7; }
+  .growth-viz { flex-shrink:0; display:flex; align-items:flex-end; gap:5px; height:64px; }
+  .bar { border-radius:4px 4px 0 0; width:10px; }
+  .bar:nth-child(1){height:20%;background:rgba(124,58,237,0.2)}
+  .bar:nth-child(2){height:35%;background:rgba(124,58,237,0.28)}
+  .bar:nth-child(3){height:45%;background:rgba(124,58,237,0.35)}
+  .bar:nth-child(4){height:55%;background:rgba(124,58,237,0.42)}
+  .bar:nth-child(5){height:65%;background:rgba(124,58,237,0.5)}
+  .bar:nth-child(6){height:78%;background:rgba(124,58,237,0.6)}
+  .bar:nth-child(7){height:88%;background:rgba(124,58,237,0.72)}
+  .bar:nth-child(8){height:100%;background:linear-gradient(180deg,#c4b5fd,#7c3aed)}
+
+  .feed { display:flex; flex-direction:column; gap:8px; }
+  .feed-item { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px 14px; font-size:12px; color:#94a3b8; }
+  .feed-item.new { border-color:rgba(124,58,237,0.3); }
+  .feed-src img { width:14px; height:14px; object-fit:contain; display:block; }
+  .feed-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.12); flex-shrink:0; }
+  .feed-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .feed-arrow { color:#7c3aed; font-size:13px; flex-shrink:0; }
+  .feed-dest { color:#a78bfa; font-size:11px; flex-shrink:0; font-weight:600; }
+
+  .features { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:56px; }
+  .feature { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:22px 18px; }
+  .feature-icon { font-size:22px; margin-bottom:10px; }
+  .feature h3 { font-size:13px; font-weight:600; margin-bottom:5px; }
+  .feature p { font-size:11px; color:#64748b; line-height:1.5; }
+
+  .cta { background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); border-radius:20px; padding:40px 32px; text-align:center; margin-bottom:44px; }
+  .cta h2 { font-size:22px; font-weight:700; margin-bottom:8px; }
+  .cta p { font-size:13px; color:#94a3b8; margin-bottom:24px; }
+  .form { display:flex; gap:8px; max-width:400px; margin:0 auto; }
+  .form input { flex:1; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:13px 16px; color:#fff; font-size:14px; outline:none; }
+  .form input::placeholder { color:#64748b; }
+  .form button { background:#7c3aed; color:#fff; border:none; border-radius:10px; padding:13px 20px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .form-hint { font-size:12px; color:#475569; margin-top:8px; }
+
+  footer { text-align:center; font-size:12px; color:#334155; padding-top:28px; border-top:1px solid rgba(255,255,255,0.06); }
+
+  .browser { background:#0f0f1a; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); margin:16px; }
+  .browser-bar { background:#1a1a2e; padding:10px 16px; display:flex; align-items:center; gap:6px; }
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .url{flex:1;background:rgba(255,255,255,0.06);border-radius:6px;padding:4px 10px;font-size:11px;color:#64748b;margin:0 12px;font-family:monospace}
+</style>
+</head>
+<body>
+
+<div class="browser">
+  <div class="browser-bar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <div class="url">obsidian-migration.vercel.app</div>
+  </div>
+
+  <div class="page">
+    <nav>
+      <div class="logo">✦ Obsidian Migration</div>
+    </nav>
+
+    <div class="hero">
+      <h1>파편화된 지식을<br>하나로 통합하세요</h1>
+      <p class="sub">AI가 Notion, Slack, Google의 모든 데이터를 분석하고<br>Obsidian 지식 그래프로 자동 변환합니다</p>
+    </div>
+
+    <!-- 다이어그램 -->
+    <div class="diagram">
+      <div class="source-logos">
+        <div class="src-item"><div class="src-icon"><img src="https://cdn.simpleicons.org/notion/ffffff" alt="Notion"></div><div class="src-label">Notion</div></div>
+        <div class="src-item"><div class="src-icon"><img src="https://cdn.simpleicons.org/slack/ffffff" alt="Slack"></div><div class="src-label">Slack</div></div>
+        <div class="src-item"><div class="src-icon"><img src="https://cdn.simpleicons.org/google" alt="Google"></div><div class="src-label">Google</div></div>
+      </div>
+      <svg class="flow-svg" viewBox="0 0 680 220">
+        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#334155;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#7c3aed;stop-opacity:0.9"/></linearGradient></defs>
+        <path d="M 100 55  C 320 55,  420 110, 590 110" stroke="url(#g1)" stroke-width="1.5" fill="none" stroke-dasharray="6 5" opacity="0.7"/>
+        <path d="M 100 110 C 280 110, 420 110, 590 110" stroke="url(#g1)" stroke-width="1.5" fill="none" stroke-dasharray="6 5" opacity="0.7"/>
+        <path d="M 100 165 C 320 165, 420 110, 590 110" stroke="url(#g1)" stroke-width="1.5" fill="none" stroke-dasharray="6 5" opacity="0.7"/>
+      </svg>
+      <div class="particle pt1"></div><div class="particle pt2"></div><div class="particle pt3"></div>
+      <div class="particle pt1b"></div><div class="particle pt2b"></div><div class="particle pt3b"></div>
+      <div class="obsidian-center">
+        <div class="obsidian-icon"><img src="https://cdn.simpleicons.org/obsidian/ffffff" alt="Obsidian"></div>
+        <div class="obsidian-label">Obsidian</div>
+      </div>
+    </div>
+
+    <!-- 공감 -->
+    <div class="empathy">
+      <div class="section-intro">
+        <div class="eyebrow">문제</div>
+        <p>분산된 구조로 쌓인 지식은 검색도, 연결도, 활용도 어렵습니다.<br>도구가 많을수록 오히려 지식은 더 깊이 묻혀버립니다.</p>
+      </div>
+      <div class="pain-cards">
+        <div class="pain-card p1">
+          <div class="pain-icon-wrap">😮‍💨</div>
+          <div class="pain-body">
+            <h3>중요한 내용인데,<br>어디에 저장했는지 찾을 수가 없습니다</h3>
+            <p>Notion에 적어둔 것 같기도 하고, Slack에서 공유된 것 같기도 하고. 필요한 순간마다 여러 툴을 뒤지다 결국 포기하게 됩니다.</p>
+            <div class="scatter">
+              <span class="scatter-tag">Notion 페이지 #348</span>
+              <span class="scatter-tag lost">Slack 어딘가...</span>
+              <span class="scatter-tag lost">구글 드라이브 폴더?</span>
+              <span class="scatter-tag lost">메모장?</span>
+            </div>
+          </div>
+        </div>
+        <div class="pain-card p1">
+          <div class="pain-icon-wrap">💭</div>
+          <div class="pain-body">
+            <h3>Obsidian을 쓰고 싶은데,<br>지금까지 쌓아온 문서들을 다 가져오는 건 엄두가 안 납니다</h3>
+            <p>Obsidian이 최고의 지식 관리 도구라는 건 알지만, 지금까지 쌓아온 문서를 구조에 맞게 이전하는 작업은 너무 방대해서 시작조차 어렵습니다.</p>
+            <div class="obsidian-question">
+              <span class="q-mark">"</span>
+              하나씩 복붙하다 포기했어요. 연결도 다 끊기고, 구조도 없고...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 솔루션 -->
+    <div class="section-intro">
+      <div class="eyebrow">솔루션</div>
+      <p>Obsidian Migration은 흩어진 데이터를 한 번에 정리하고,<br>이후엔 새로운 정보가 자동으로 쌓이는 구조를 만들어드립니다</p>
+    </div>
+
+    <div class="flow-wrap">
+      <div class="migration-area">
+        <div class="migration-header">
+          <div class="migration-label">마이그레이션</div>
+          <div class="migration-line"></div>
+        </div>
+        <div class="steps-row">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h3>모든 지식을 한 곳에</h3>
+            <p>Notion, Slack, Google에 흩어진 지식을 연결하고 Obsidian으로 옮길 데이터를 선택합니다</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h3>AI가 구조를 설계합니다</h3>
+            <p>흩어진 데이터를 통합 분석해 폴더 구조, 태그 체계, 노트 간 연결 관계를 전부 자동으로 설계합니다</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h3>Obsidian에 완벽 정리</h3>
+            <p>설계된 구조 그대로 내 Obsidian에 저장됩니다. 처음부터 체계적으로 연결된 지식 베이스가 완성됩니다</p>
+          </div>
+        </div>
+      </div>
+      <div class="transition-band">
+        <div class="t-line l"></div>
+        <div class="t-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
+        <div class="t-line r"></div>
+      </div>
+      <div class="growth-area">
+        <div class="growth-top">
+          <div class="growth-text">
+            <div class="growth-eyebrow">↻ 지속 수집</div>
+            <h3>나의 Obsidian이<br>매일 성장합니다</h3>
+            <p>새로운 Slack 메시지, Notion 페이지, Google Docs가 생길 때마다 AI가 분석해 Obsidian에 최적화된 형태로 자동 누적합니다</p>
+          </div>
+          <div class="growth-viz">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div>
+          </div>
+        </div>
+        <div class="feed">
+          <div class="feed-item">
+            <div class="feed-src"><img src="https://cdn.simpleicons.org/slack/ffffff" alt="S"></div>
+            <div class="feed-dot"></div>
+            <div class="feed-title">디자인 리뷰 채널 — 오늘 논의 내용</div>
+            <div class="feed-arrow">→</div>
+            <div class="feed-dest">Projects/디자인</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-src"><img src="https://cdn.simpleicons.org/notion/ffffff" alt="N"></div>
+            <div class="feed-dot"></div>
+            <div class="feed-title">Q2 전략 기획안 업데이트</div>
+            <div class="feed-arrow">→</div>
+            <div class="feed-dest">Areas/전략</div>
+          </div>
+          <div class="feed-item new">
+            <div class="feed-src"><img src="https://cdn.simpleicons.org/google" alt="G"></div>
+            <div class="feed-dot"></div>
+            <div class="feed-title">사용자 인터뷰 정리 문서 ✦ 방금 추가됨</div>
+            <div class="feed-arrow">→</div>
+            <div class="feed-dest">Resources/리서치</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- CTA -->
+    <div class="cta">
+      <h2>베타 출시 알림 받기</h2>
+      <p>지금 신청하면 런칭 시 가장 먼저 소식을 전해드립니다</p>
+      <div class="form">
+        <input type="email" placeholder="이메일을 입력하세요">
+        <button>신청하기 →</button>
+      </div>
+      <p class="form-hint">스팸 없음 · 런칭 알림만 발송</p>
+    </div>
+
+    <footer>© 2026 Obsidian Migration · 데이터는 서버에 저장되지 않습니다</footer>
+  </div>
+</div>
+</body>
+</html>
