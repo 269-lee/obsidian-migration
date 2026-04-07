@@ -4,16 +4,16 @@ import anthropic
 
 class NoteClassifier:
     def __init__(self, api_key: str):
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.client = anthropic.AsyncAnthropic(api_key=api_key)
 
-    def classify(
+    async def classify(
         self,
         document: dict,
         schema: dict,
         all_titles: list[str],
         folder_structure: list[str],
     ) -> dict:
-        response = self.client.messages.create(
+        response = await self.client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=8096,
             messages=[{
@@ -53,7 +53,13 @@ class NoteClassifier:
 }}"""
             }]
         )
-        return json.loads(response.content[0].text)
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```", 2)[1]
+            if text.startswith("json"):
+                text = text[4:]
+            text = text.rsplit("```", 1)[0].strip()
+        return json.loads(text)
 
     def to_markdown(self, classified: dict) -> str:
         fm = classified["frontmatter"]

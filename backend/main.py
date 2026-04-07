@@ -73,12 +73,12 @@ def list_google_docs(body: dict):
 
 
 @app.post("/api/migrate")
-def migrate(selection: SourceSelection):
+async def migrate(selection: SourceSelection):
     api_key = selection.claude_api_key
     if not api_key:
         raise HTTPException(status_code=400, detail="Claude API 키를 입력해주세요")
 
-    def generate():
+    async def generate():
         documents = []
 
         if selection.notion_token and selection.notion_page_ids:
@@ -126,7 +126,7 @@ def migrate(selection: SourceSelection):
 
         yield f"data: {json.dumps({'type': 'progress', 'message': 'Claude가 전체 문서를 분석 중...', 'percent': 35})}\n\n"
         analyzer = KnowledgeAnalyzer(api_key=api_key)
-        schema = analyzer.analyze(documents, selection.folder_structure)
+        schema = await analyzer.analyze(documents, selection.folder_structure)
 
         classifier = NoteClassifier(api_key=api_key)
         all_titles = [d["title"] for d in documents]
@@ -136,7 +136,7 @@ def migrate(selection: SourceSelection):
             doc_title = doc["title"]
             yield f"data: {json.dumps({'type': 'progress', 'message': f'{doc_title} 변환 중...', 'percent': percent})}\n\n"
 
-            classified = classifier.classify(doc, schema, all_titles, selection.folder_structure)
+            classified = await classifier.classify(doc, schema, all_titles, selection.folder_structure)
             file_content = classifier.to_markdown(classified)
             file_path = f"{classified['folder']}/{doc['title']}.md"
 

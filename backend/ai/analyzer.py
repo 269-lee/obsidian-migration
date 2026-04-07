@@ -4,15 +4,15 @@ import anthropic
 
 class KnowledgeAnalyzer:
     def __init__(self, api_key: str):
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.client = anthropic.AsyncAnthropic(api_key=api_key)
 
-    def analyze(self, documents: list[dict], folder_structure: list[str]) -> dict:
+    async def analyze(self, documents: list[dict], folder_structure: list[str]) -> dict:
         doc_summaries = "\n\n".join(
             f"[{d['source']}] 제목: {d['title']}\n내용: {d['content'][:800]}"
             for d in documents
         )
 
-        response = self.client.messages.create(
+        response = await self.client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=4096,
             messages=[{
@@ -41,4 +41,10 @@ class KnowledgeAnalyzer:
             }]
         )
 
-        return json.loads(response.content[0].text)
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```", 2)[1]
+            if text.startswith("json"):
+                text = text[4:]
+            text = text.rsplit("```", 1)[0].strip()
+        return json.loads(text)

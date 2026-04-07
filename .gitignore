@@ -22,3 +22,11 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# Migration cache & output (runtime artifacts)
+backend/cache_*.json
+backend/migration_cache.json
+backend/vault_schema_cache.json
+backend/migration_log*.txt
+backend/migration_output/
+backend/migration_output_v2/
