@@ -1,0 +1,23 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+COMMIT_MSG=$(cat "$1")
+
+# API 크레딧 낭비 위험 키워드 감지
+if echo "$COMMIT_MSG" | grep -qiE '(낭비|크레딧|전체 재실행|캐시 삭제|force rerun|reprocess all)'; then
+  echo ""
+  echo "⚠️  커밋 메시지에 API 크레딧 관련 위험 키워드가 감지되었습니다."
+  echo ""
+  echo "CLAUDE.md 크레딧 낭비 방지 규칙 확인:"
+  echo "  - 캐시 없이 대량 문서를 재처리하는 코드인가?"
+  echo "  - 모든 단계에 증분 캐시가 있는가?"
+  echo "  - 캐시 key가 page_id 등 고유값을 사용하는가?"
+  echo "  - 예상 비용을 사용자에게 먼저 알렸는가?"
+  echo ""
+  echo "  계속 커밋하려면 메시지에 '[cost-reviewed]'를 추가하세요."
+  echo ""
+
+  if ! echo "$COMMIT_MSG" | grep -q '\[cost-reviewed\]'; then
+    exit 1
+  fi
+fi

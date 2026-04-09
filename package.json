@@ -1,0 +1,26 @@
+{
+  "name": "obsidian-migration",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:backend": "cd backend && python -m black --check . && python -m flake8 . --max-line-length=120 --exclude=venv,__pycache__,migration_output,migration_output_v2",
+    "lint:frontend": "cd frontend && npx tsc --noEmit",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "test:backend": "cd backend && pytest tests/ -v",
+    "test": "npm run test:backend"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "backend/**/*.py": [
+      "python -m black --check",
+      "python -m flake8 --max-line-length=120"
+    ],
+    "frontend/**/*.{ts,tsx}": [
+      "bash -c 'cd frontend && npx tsc --noEmit'"
+    ]
+  }
+}

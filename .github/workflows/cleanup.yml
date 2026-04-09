@@ -1,0 +1,45 @@
+name: Weekly Cache Cleanup
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"  # 매주 일요일 00:00 UTC
+  workflow_dispatch:       # 수동 실행 가능
+    inputs:
+      dry_run:
+        description: "Dry run (실제 삭제 없이 확인만)"
+        type: boolean
+        default: true
+
+jobs:
+  cleanup:
+    name: Cleanup Old Caches & Archives
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run cleanup (dry-run preview)
+        if: ${{ github.event.inputs.dry_run == 'true' || github.event_name == 'schedule' }}
+        run: python backend/scripts/cleanup.py --dry-run
+
+      - name: Run cleanup (actual)
+        if: ${{ github.event.inputs.dry_run == 'false' }}
+        run: python backend/scripts/cleanup.py
+
+      - name: Commit deleted files
+        if: ${{ github.event.inputs.dry_run == 'false' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "삭제된 파일 없음"
+          else
+            git commit -m "chore: 오래된 캐시 및 아카이브 자동 정리 [cost-reviewed]"
+            git push
+          fi

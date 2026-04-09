@@ -1,0 +1,32 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Backend: black + flake8 on staged Python files
+STAGED_PY=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+if [ -n "$STAGED_PY" ]; then
+  echo "▶ Backend: black 포맷 검사..."
+  cd backend && python -m black --check $STAGED_PY 2>&1 || {
+    echo "❌ black 포맷 오류. 'cd backend && black .' 후 다시 커밋하세요."
+    exit 1
+  }
+
+  echo "▶ Backend: flake8 린트..."
+  python -m flake8 $STAGED_PY --max-line-length=120 2>&1 || {
+    echo "❌ flake8 오류가 있습니다."
+    exit 1
+  }
+  cd ..
+fi
+
+# Frontend: tsc + eslint on staged TS/TSX files
+STAGED_TS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+if [ -n "$STAGED_TS" ]; then
+  echo "▶ Frontend: TypeScript 타입 검사..."
+  cd frontend && npx tsc --noEmit 2>&1 || {
+    echo "❌ TypeScript 오류가 있습니다."
+    exit 1
+  }
+  cd ..
+fi
+
+echo "✅ pre-commit 검사 통과"

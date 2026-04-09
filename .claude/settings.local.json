@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__harness-coach__diagnose_harness"
+    ]
+  }
+}
